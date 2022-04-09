@@ -1,0 +1,41 @@
+                            | # rsum.ys
+                            | # Benjamin Prud'homme
+                            | 
+                            | # Start of execution 
+0x000:                      | .pos 0
+0x000: 30f40001000000000000 | irmovq Stack, %rsp		# Initialize stack pointer
+0x00a: 30f72000000000000000 | irmovq ele1, %rdi		# Initialize first list node
+0x014: 805000000000000000   | call rsum_list
+0x01d: 00                   | halt
+                            | 
+                            | # Sample linked list
+0x020:                      | .align 8
+0x020:                      | ele1:
+0x020: 0a00000000000000     | 	.quad 0x00a
+0x028: 3000000000000000     | 	.quad ele2
+0x030:                      | ele2:
+0x030: b000000000000000     | 	.quad 0x0b0
+0x038: 4000000000000000     | 	.quad ele3
+0x040:                      | ele3:
+0x040: 000c000000000000     | 	.quad 0xc00
+0x048: 0000000000000000     | 	.quad 0
+                            | 
+                            | # long sum_list(list_ptr ls)
+0x050:                      | rsum_list:	
+0x050: 6300                 | 	xorq %rax, %rax		# return value = 0
+0x052: 2078                 | 	rrmovq %rdi, %r8
+0x054: 6288                 | 	andq %r8, %r8
+0x056: 738200000000000000   | 	je done			# If %rdx is 0 (end of the list), end
+0x05f: a03f                 | 	pushq %rbx		# Save callee-saved register
+0x061: 50370000000000000000 | 	mrmovq (%rdi), %rbx	# Get ls->val
+0x06b: 50770800000000000000 | 	mrmovq 8(%rdi), %rdi	# ls = ls->next
+0x075: 805000000000000000   | 	call rsum_list		# Recursive call
+0x07e: 6030                 | 	addq %rbx, %rax		# val += ls->val
+0x080: b03f                 | 	popq %rbx		# Restore callee-saved register
+0x082:                      | done:
+0x082: 90                   | 	ret
+                            | 
+0x100:                      | .pos 0x100
+0x100:                      | Stack:
+                            | 	
+                            | 	

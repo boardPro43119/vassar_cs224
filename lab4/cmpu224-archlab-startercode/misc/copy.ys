@@ -1,0 +1,42 @@
+# copy.ys
+# Benjamin Prud'homme
+
+# Start of execution 
+.pos 0
+irmovq Stack, %rsp		# Initialize stack pointer
+irmovq src, %rdi		# Initialize source block (arg 1)
+irmovq dest, %rsi		# Initialize destination block (arg 2)
+irmovq $3, %rdx			# Initialize length parameter (arg 3)
+call copy_block
+halt
+
+# Sample source and destination blocks
+.align 8
+src:
+	.quad 0x00a
+	.quad 0x0b0
+	.quad 0xc00
+dest:
+	.quad 0x111
+	.quad 0x222
+	.quad 0x333
+
+copy_block:
+	xorq %rax, %rax		# result = 0
+	irmovq $1, %r9		# Constant 1 (for decrementing len)
+	irmovq $8, %r10		# Constant 8 (for incrementing src)
+loop:
+	andq %rdx, %rdx
+	jle done		# If %rdi <= 0, end
+	mrmovq (%rdi), %r8	# val = *src
+	rmmovq %r8, (%rsi)	# *dest = val
+	addq %r10, %rdi		# src++
+	addq %r10, %rsi		# dest++
+	xorq %r8, %rax		# result ^= val
+	subq %r9, %rdx		# len--		
+	jmp loop		# Loop back
+done:
+	ret
+
+.pos 0x100
+Stack:

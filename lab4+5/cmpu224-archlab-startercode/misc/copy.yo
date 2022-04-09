@@ -1,0 +1,42 @@
+                            | # copy.ys
+                            | # Benjamin Prud'homme
+                            | 
+                            | # Start of execution 
+0x000:                      | .pos 0
+0x000: 30f40001000000000000 | irmovq Stack, %rsp		# Initialize stack pointer
+0x00a: 30f73800000000000000 | irmovq src, %rdi		# Initialize source block (arg 1)
+0x014: 30f65000000000000000 | irmovq dest, %rsi		# Initialize destination block (arg 2)
+0x01e: 30f20300000000000000 | irmovq $3, %rdx			# Initialize length parameter (arg 3)
+0x028: 806800000000000000   | call copy_block
+0x031: 00                   | halt
+                            | 
+                            | # Sample source and destination blocks
+0x038:                      | .align 8
+0x038:                      | src:
+0x038: 0a00000000000000     | 	.quad 0x00a
+0x040: b000000000000000     | 	.quad 0x0b0
+0x048: 000c000000000000     | 	.quad 0xc00
+0x050:                      | dest:
+0x050: 1101000000000000     | 	.quad 0x111
+0x058: 2202000000000000     | 	.quad 0x222
+0x060: 3303000000000000     | 	.quad 0x333
+                            | 
+0x068:                      | copy_block:
+0x068: 6300                 | 	xorq %rax, %rax		# result = 0
+0x06a: 30f90100000000000000 | 	irmovq $1, %r9		# Constant 1 (for decrementing len)
+0x074: 30fa0800000000000000 | 	irmovq $8, %r10		# Constant 8 (for incrementing src)
+0x07e:                      | loop:
+0x07e: 6222                 | 	andq %rdx, %rdx
+0x080: 71ae00000000000000   | 	jle done		# If %rdi <= 0, end
+0x089: 50870000000000000000 | 	mrmovq (%rdi), %r8	# val = *src
+0x093: 40860000000000000000 | 	rmmovq %r8, (%rsi)	# *dest = val
+0x09d: 60a7                 | 	addq %r10, %rdi		# src++
+0x09f: 60a6                 | 	addq %r10, %rsi		# dest++
+0x0a1: 6380                 | 	xorq %r8, %rax		# result ^= val
+0x0a3: 6192                 | 	subq %r9, %rdx		# len--		
+0x0a5: 707e00000000000000   | 	jmp loop		# Loop back
+0x0ae:                      | done:
+0x0ae: 90                   | 	ret
+                            | 
+0x100:                      | .pos 0x100
+0x100:                      | Stack:

@@ -1,0 +1,41 @@
+                            | # sum.ys
+                            | # Benjamin Prud'homme
+                            | 
+                            | # Start of execution 
+0x000:                      | .pos 0
+0x000: 30f40001000000000000 | irmovq Stack, %rsp		# Initialize stack pointer
+0x00a: 30f72000000000000000 | irmovq ele1, %rdi		# Initialize first list node
+0x014: 805000000000000000   | call sum_list
+0x01d: 00                   | halt
+                            | 
+                            | # Sample linked list
+0x020:                      | .align 8
+0x020:                      | ele1:
+0x020: 0a00000000000000     | 	.quad 0x00a
+0x028: 3000000000000000     | 	.quad ele2
+0x030:                      | ele2:
+0x030: b000000000000000     | 	.quad 0x0b0
+0x038: 4000000000000000     | 	.quad ele3
+0x040:                      | ele3:
+0x040: 000c000000000000     | 	.quad 0xc00
+0x048: 0000000000000000     | 	.quad 0
+                            | 
+                            | # long sum_list(list_ptr ls)
+0x050:                      | sum_list:	
+0x050: 6300                 | 	xorq %rax, %rax		# val = 0
+                            | 
+0x052:                      | loop:
+0x052: 2078                 | 	rrmovq %rdi, %r8
+0x054: 6288                 | 	andq %r8, %r8
+0x056: 737e00000000000000   | 	je done			# If %rdx is 0 (end of the list), end
+0x05f: 50170000000000000000 | 	mrmovq (%rdi), %rcx	# Get ls->val
+0x069: 6010                 | 	addq %rcx, %rax		# val += ls->val
+0x06b: 50770800000000000000 | 	mrmovq 8(%rdi), %rdi	# ls = ls->next
+0x075: 705200000000000000   | 	jmp loop		# Loop back
+0x07e:                      | done:
+0x07e: 90                   | 	ret
+                            | 
+0x100:                      | .pos 0x100
+0x100:                      | Stack:
+                            | 	
+                            | 	
